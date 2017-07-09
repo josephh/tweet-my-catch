@@ -89,7 +89,7 @@ class CatchesFilterForm extends Component {
                 <FormControl
                   type="text"
                   value={this.state.angler}
-                  placeholder="Enter location tag(s)"
+                  placeholder="Enter angler tag(s)"
                   onChange={this.handleChange}
                 />
                 <FormControl.Feedback />
