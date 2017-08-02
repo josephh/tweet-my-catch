@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import CatchFilter from './components/CatchFilter/CatchFilter.js';
-import {Grid, Col, Row} from 'react-bootstrap';
+import CatchesLayout from './components/CatchesLayout/CatchesLayout.js';
+import {Grid, Row} from 'react-bootstrap';
 
 class App extends Component {
   render() {
@@ -14,20 +14,7 @@ class App extends Component {
         </div>
         <Grid>
           <Row>
-            <Col xs={12} md={6}>
-              <h3>Log a catch</h3>
-            </Col>
-            <Col xs={12} md={6}>
-              <h3>Browse catches</h3>
-            </Col>
-          </Row>
-          <Row>
-            <Col xs={12} md={6}>
-              <p>Log catch form or link here</p>
-            </Col>
-            <Col xs={12} md={6}>
-              <CatchFilter/>
-            </Col>
+            <CatchesLayout />
           </Row>
         </Grid>
       </div>
