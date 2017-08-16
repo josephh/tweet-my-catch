@@ -77,10 +77,10 @@ class CatchesLayout extends Component {
               <div className="picture">
                 <img src={image} style={{height}}></img>
                 <p className="a-layer">
-                  <span className="al-species"><strong>[{i}]</strong>  {species ? species : "unknown"} (caught by:
+                  <span className="al-species"><strong>[{i}]  </strong>
                   {tags.reduce((a, b) => {
                     return b.type === "angler" ? a.concat(b.value) : a.concat("");
-                  } , "")})</span>
+                  } , "")}</span>
                   <span className="al-date">{formattedDate}</span>
                 </p>
               </div>
