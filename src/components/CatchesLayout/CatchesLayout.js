@@ -1,8 +1,10 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import Masonry from 'react-masonry-infinite';
+import './CatchesLayout.css';
 
 let Util = require('./util');
+let log = require('console-log-level')({ level: 'debug' });
 
 class CatchesLayout extends Component {
 
@@ -12,38 +14,48 @@ class CatchesLayout extends Component {
         hasMore: true,
         elements: []
       };
-    }
-
-  componentDidMount() {
-    this.getData();
   }
 
-  loadMore = () => setTimeout(() => this.setState(state => ({
-    elements: state.elements.concat(this.getData()),
-  })), 2500);
+  componentDidMount() {
+    this.getData().then((elements) => {
+      this.setState(state => ({
+        elements: elements
+      }));
+    })
+  }
 
-  getData() {
-    Util.ajax('http://localhost:8000/api/catches', d => {
-      var elements = JSON.parse(d).data;
-      console.log("elements size? " + elements.length);
-      this.setState(
-        {
-          elements: elements,
-          hasMore: false
-        }
-      )
-      // ... ???
-      },
-      () => {
-        alert("ajax call failed")
-      }
-    );
+  loadMore = () => setTimeout( () => {
+    this.getData().then((elements) => {
+      this.setState(state => ({
+        elements: state.elements.concat(elements),
+      }))
+    }, 5000)
+    log.debug(`loadMore::new elements size? ${this.state.elements.length}`);
+    if(this.state.elements.length > 100) {
+      log.debug('loadMore::more than 100 elements, so set hasMore to false');
+      this.setState(state => {
+        hasMore: false
+      });
+    }
+  })
+
+  async getData() {
+    var d = await Util.ajax('http://localhost:8000/api/catches');
+    // variable 'd' is an array-like object - but not an array per se, so use
+    // Function.prototype.[func].call()
+    var elements = Array.prototype.slice.call(d.data);
+    elements.forEach((element) => {
+      element.formattedDate = new Date(element.date).toLocaleDateString();
+    });
+    return elements;
   }
 
   render() {
     if (this.state.elements.length === 0) {
       return <div>loading...</div>;
     }
+
+    const height = 200;
 
     return (
       <div className="albumPanel">
@@ -61,9 +73,16 @@ class CatchesLayout extends Component {
           loadMore={this.loadMore}
         >
           {
-            this.state.elements.map(({ image }, i) => (
+            this.state.elements.map(({ image, species, tags, formattedDate }, i) => (
               <div className="picture">
-                <img src={image}></img>
+                <img src={image} style={{height}}></img>
+                <p className="a-layer">
+                  <span className="al-species"><strong>[{i}]</strong>  {species ? species : "unknown"} (caught by:
+                  {tags.reduce((a, b) => {
+                    return b.type === "angler" ? a.concat(b.value) : a.concat("");
+                  } , "")})</span>
+                  <span className="al-date">{formattedDate}</span>
+                </p>
               </div>
             ))
           }

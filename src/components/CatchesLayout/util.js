@@ -13,24 +13,30 @@
 
 let Util = {};
 
-Util.ajax = function(url, successCallback, failCallback) {
-  var request = new XMLHttpRequest();
-  request.open('GET', url, true);
-
-  request.onreadystatechange = function() {
-    if (this.readyState === 4) {
-
-      if (this.status >= 200 && this.status < 400) {
-        successCallback(this.responseText);
+Util.ajax = function get(url) {
+  return new Promise(function(resolve, reject) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url), true;
+    xhr.onload = function() {
+      // This is called even on 404 etc
+      // so check the status
+      if (xhr.status == 200) {
+        // Resolve the promise with the response text
+        resolve(JSON.parse(xhr.response));
       } else {
-        failCallback();
+        // Otherwise reject with the status text
+        // which will hopefully be a meaningful error
+        reject(Error(xhr.statusText));
       }
-    }
-  };
-
-  request.send();
-  request = null;
-};
+    };
+    // Handle network errors
+    xhr.onerror = function() {
+      reject(Error("Network Error"));
+    };
+    // Make the request
+    xhr.send();
+  });
+}
 
 Util.ready = function(callback) {
   if (document.readyState !== 'loading'){
@@ -68,23 +74,6 @@ Util.on = function(el, eventName, handler) {
       handler.call(el);
     });
   }
-};
-
-Util.getUrlParams = function(k) {
-  var params = {};
-  var url = location.href;
-  var idx = url.indexOf('?');
-
-  if (idx > 0) {
-    var queryStr = url.substring(idx + 1);
-    var args = queryStr.split('&');
-    for (var i = 0; i < args.length; i++) {
-      var a = args[i];
-      var nv = args[i] = a.split('=');
-      params[nv[0]] = nv.length > 1 ? nv[1] : true;
-    }
-  }
-  return params[k];
 };
 
 Util.width = function(el) {
