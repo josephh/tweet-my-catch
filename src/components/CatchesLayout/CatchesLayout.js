@@ -24,12 +24,12 @@ class CatchesLayout extends Component {
     })
   }
 
-  loadMore = () => setTimeout( () => {
+  loadMore = () => {
     this.getData().then((elements) => {
       this.setState(state => ({
         elements: state.elements.concat(elements),
       }))
-    }, 5000)
+    })
     log.debug(`loadMore::new elements size? ${this.state.elements.length}`);
     if(this.state.elements.length > 100) {
       log.debug('loadMore::more than 100 elements, so set hasMore to false');
@@ -37,7 +37,7 @@ class CatchesLayout extends Component {
         hasMore: false
       });
     }
-  })
+  }
 
   async getData() {
     var d = await Util.ajax('http://localhost:8000/api/catches');
@@ -74,7 +74,7 @@ class CatchesLayout extends Component {
         >
           {
             this.state.elements.map(({ image, species, tags, formattedDate }, i) => (
-              <div className="picture">
+              <div className="picture" key={i}>
                 <img src={image} style={{height}}></img>
                 <p className="a-layer">
                   <span className="al-species"><strong>[{i}]  </strong>
